@@ -4,7 +4,7 @@ import { Resend } from 'resend';
 const resend = new Resend(env.RESEND_API_KEY);
 
 export const sendEmail = async (email:string, username:string, otp:number) => {
-  const { data, error } = await resend.emails.send({
+  const { data } = await resend.emails.send({
     from: 'Acme <onboarding@resend.dev>',
     to: email,
     subject: "Echo Anon Sign Up",
@@ -13,7 +13,6 @@ export const sendEmail = async (email:string, username:string, otp:number) => {
     <p>Here is your OTP Code: ${otp}</p>
     </div>`})
     
-    console.log(error)
   return data
 
 }

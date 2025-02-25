@@ -1,12 +1,11 @@
 import React, {useState} from 'react'
 import { Button } from '@/components/ui/button'
 import { signIn } from 'next-auth/react';
-import { AuthProviderType } from './AllAuthProviders';
 
 export type SignStatusType = "Sign In" | "Sign Up"
 
 
-function AuthProviderComponent({signStatus, id, icon, name}:{signStatus:SignStatusType, id:string, icon:React.ReactElement, name:string}) {
+function AllAuthProviders({signStatus, id, icon, name}:{signStatus:SignStatusType, id:string, icon:React.ReactElement, name:string}) {
   const [loading, setLoading] = useState(false)
     const handleSignIn = () => {
         setLoading(true)
@@ -27,4 +26,4 @@ function AuthProviderComponent({signStatus, id, icon, name}:{signStatus:SignStat
   )
 }
 
-export default AuthProviderComponent
+export default AllAuthProviders
