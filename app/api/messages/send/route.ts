@@ -21,6 +21,10 @@ export async function POST(req:NextRequest){
         return NextResponse.json({message:"The user by that username doesn't exists"}, {status:400})
     }
 
+    if (!findUser.acceptMessage){
+        return NextResponse.json({message:"The user by that username doesn't exists"}, {status:400})
+    }
+
 
 
     const feedback = Feedback.create({
