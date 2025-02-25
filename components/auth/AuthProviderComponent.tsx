@@ -1,6 +1,7 @@
 import React, {useState} from 'react'
 import { Button } from '@/components/ui/button'
 import { signIn } from 'next-auth/react';
+import AuthProviderComponent from './AuthProviderComponent';
 
 export type SignStatusType = "Sign In" | "Sign Up"
 

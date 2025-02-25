@@ -15,7 +15,7 @@ const authProviders = [
   },
 ]
 
-function AuthProviderComponent({signStatus="Sign Up"}:{signStatus?:SignStatusType}) {
+function AllAuthProviders({signStatus="Sign Up"}:{signStatus?:SignStatusType}) {
   
   return (
     <>
@@ -26,4 +26,4 @@ function AuthProviderComponent({signStatus="Sign Up"}:{signStatus?:SignStatusTyp
   )
 }
 
-export default AuthProviderComponent
+export default AllAuthProviders
