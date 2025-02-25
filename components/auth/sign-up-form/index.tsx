@@ -14,11 +14,17 @@ import {
   FormLabel,
   FormMessage,
 } from "@/components/ui/form";
+import {
+  InputOTP,
+  InputOTPGroup,
+  InputOTPSeparator,
+  InputOTPSlot,
+} from "@/components/ui/input-otp"
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import AuthProviderComponent from "../AllAuthProviders";
+import AllAuthProviders from "../AllAuthProviders";
 
 
 const FormSchema = z
@@ -58,6 +64,7 @@ const FormSchema = z
         message:
           "The password must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number",
       }),
+      otpCode: z.number()
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -72,14 +79,36 @@ export default function InputForm() {
       email: "",
       password: "",
       confirmPassword: "",
+      otpCode:null
     },
   });
+  const [page, setPage] = useState(1)
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
 
   async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
+      if (page===1){
+        setPage(2)
+        return
+      }
+      if (page===1){
       setIsLoading(true);
+      const emailSendRes = await axios.post("/api/users/send-email")
+      if (emailSendRes.status === 200) {
+        toast.success("Email sent successfully!", {
+          description:<div>
+            <h1>Hello {data.username}</h1>
+            <p>Please check your email for a verification code.</p>
+          </div>
+        })
+        setPage(2)
+        return
+      } else {
+        toast.error("Failed to send email. Please try again.")
+        return
+      }}
+
       const response = await axios.post("/api/users/sign-up", data);
 
       if (response.status === 200) {
@@ -107,7 +136,8 @@ export default function InputForm() {
     }
   }
 
-  return (
+  switch(page){
+  case 1: return (
     <>
       <Form {...form}>
         <form
@@ -204,15 +234,37 @@ export default function InputForm() {
             >
               Sign In
             </Link>
+          
           </p>
           <div className="relative flex items-center">
             <div className="flex-grow border-t border-gray-400"></div>
             <span className="flex-shrink mx-4 text-gray-400">or</span>
             <div className="flex-grow border-t border-gray-400"></div>
           </div>
-          <AuthProviderComponent />
+          <AllAuthProviders />
         </form>
       </Form>
     </>
   );
+  break
+  case 2: return(
+    <>
+      <h1>Page 2</h1>
+      <InputOTP maxLength={6}>
+      <InputOTPGroup>
+        <InputOTPSlot index={0} />
+        <InputOTPSlot index={1} />
+        <InputOTPSlot index={2} />
+      </InputOTPGroup>
+      <InputOTPSeparator />
+      <InputOTPGroup>
+        <InputOTPSlot index={3} />
+        <InputOTPSlot index={4} />
+        <InputOTPSlot index={5} />
+      </InputOTPGroup>
+    </InputOTP>
+      <Button onClick={() => setPage(1)}>Go back to page 1</Button>
+    </>
+  )
+}
 }
