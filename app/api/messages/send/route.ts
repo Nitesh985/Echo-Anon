@@ -22,7 +22,7 @@ export async function POST(req:NextRequest){
     }
 
     if (!findUser.acceptMessage){
-        return NextResponse.json({message:"The user by that username doesn't exists"}, {status:400})
+        return NextResponse.json({message:"You cannot send message to the user"}, {status:405})
     }
 
 

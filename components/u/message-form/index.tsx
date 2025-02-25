@@ -52,7 +52,12 @@ export default function MessageForm({message}:{message:string}) {
       if (res.status===200){toast.success("Message sent successfully!")
       form.setValue("content", "")}
     })
-    .catch(error=>console.log(error))
+    .catch(error=> {
+      if (error && error.response && error.response?.data && error.response?.data?.message) {
+        toast.error(error.response.data.message);
+      }
+      console.log(error)
+    })
     .finally(()=>setLoading(false))
     
   }
