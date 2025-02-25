@@ -1,6 +1,7 @@
 import { FaGithub } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { SignStatusType } from './AuthProviderComponent';
+import AuthProviderComponent from './AuthProviderComponent';
 
 const authProviders = [
   {

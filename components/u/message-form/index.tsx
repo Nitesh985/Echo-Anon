@@ -49,8 +49,9 @@ export default function MessageForm({message}:{message:string}) {
     setLoading(true)
     axios.post("/api/messages/send", {...data, username})
     .then((res)=>{
-      if (res.status===200){toast.success("Message sent successfully!")
-      form.setValue("content", "")}
+      if (res.status===200){
+        toast.success("Message sent successfully!")
+        form.setValue("content", "")}
     })
     .catch(error=> {
       if (error && error.response && error.response?.data && error.response?.data?.message) {
@@ -79,7 +80,7 @@ export default function MessageForm({message}:{message:string}) {
               <FormControl>
                 <Textarea
                   placeholder="Write your anonymous message here..."
-                  className="rounded-xl placeholder-opacity-50"
+                  className="rounded-xl placeholder-opacity-5"
                   {...field}
                 />
               </FormControl>

@@ -22,9 +22,10 @@ import {
 } from "@/components/ui/input-otp"
 import { Input } from "@/components/ui/input";
 import Link from "next/link";
-import { useState } from "react";
+import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import AllAuthProviders from "../AllAuthProviders";
+import Counter from '@/components/Counter'
 
 
 const FormSchema = z
@@ -54,7 +55,10 @@ const FormSchema = z
       .min(8, {
         message: "Password must be at least 8 characters.",
       })
-      .regex(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/gm),
+      .regex(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[a-zA-Z]).{8,}$/gm, {
+          message:
+              "The password must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number",
+      }),
     confirmPassword: z
       .string()
       .min(8, {
@@ -64,7 +68,6 @@ const FormSchema = z
         message:
           "The password must contain at least 1 uppercase letter, 1 lowercase letter, and 1 number",
       }),
-      otpCode: z.number()
   })
   .refine((data) => data.password === data.confirmPassword, {
     message: "Passwords don't match",
@@ -79,14 +82,16 @@ export default function InputForm() {
       email: "",
       password: "",
       confirmPassword: "",
-      otpCode:null
     },
   });
-  const [page, setPage] = useState(1)
+  const [page, setPage] = useState(2)
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
+  const [otpCode, setOtpCode] = useState("");
+  const [counter, setCounter] = useState(120);
 
-  async function onSubmit(data: z.infer<typeof FormSchema>) {
+
+    async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
       if (page===1){
         setPage(2)
@@ -136,9 +141,15 @@ export default function InputForm() {
     }
   }
 
+
+
+
   switch(page){
   case 1: return (
-    <>
+      <div className='flex flex-col justify-center items-center' >
+          <h1 className="text-center font-bold border border-b-black p-2 px-10" >Sign Up</h1>
+          <div className="flex justify-center items-center w-1/2 border py-5" >
+                <>
       <Form {...form}>
         <form
           onSubmit={form.handleSubmit(onSubmit)}
@@ -234,7 +245,7 @@ export default function InputForm() {
             >
               Sign In
             </Link>
-          
+
           </p>
           <div className="relative flex items-center">
             <div className="flex-grow border-t border-gray-400"></div>
@@ -245,12 +256,19 @@ export default function InputForm() {
         </form>
       </Form>
     </>
-  );
-  break
+          </div>
+      </div>
+  )
+  break;
+
   case 2: return(
     <>
-      <h1>Page 2</h1>
-      <InputOTP maxLength={6}>
+      <div className="flex justify-center items-center h-screen flex-col gap-3" >
+      <h1 className="text-3xl font-bold text-center mt-5" >Submit your OTP Code here!</h1>
+      <InputOTP
+          value={otpCode}
+          onChange={value=> setOtpCode(value)}
+          maxLength={6}>
       <InputOTPGroup>
         <InputOTPSlot index={0} />
         <InputOTPSlot index={1} />
@@ -263,7 +281,18 @@ export default function InputForm() {
         <InputOTPSlot index={5} />
       </InputOTPGroup>
     </InputOTP>
-      <Button onClick={() => setPage(1)}>Go back to page 1</Button>
+          {counter!==0?<Counter counter={counter} setCounter={setCounter}/>:<div className="text-red-600 font-bold text-sm" >TimeOut</div>}
+          <div className="text-center text-sm">
+              {otpCode === "" ? (
+                  <>Enter your one-time password.</>
+              ) : (
+                  <>You entered: {otpCode}</>
+              )}
+          </div>
+          <button className="hover:underline text-sm hover:text-purple-400 transition-colors duration-300 ease-in" >Resend Code?
+          </button>
+      <Button variant="outline" className="rounded-xl hover:text-slate-900 hover:bg-slate-100" onClick={() =>{}}>Submit</Button>
+    </div>
     </>
   )
 }

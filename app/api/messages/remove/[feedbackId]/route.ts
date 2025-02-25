@@ -5,7 +5,7 @@ import { Feedback } from "@/model/feedback.model";
 
 export async function DELETE(req: NextRequest, {params}:{params:{feedbackId:string}}) {
     await getUserFromToken(req)
-    const {feedbackId } = params
+    const {feedbackId } = await params
 
     const feedbackDeleted = await Feedback.findByIdAndDelete(feedbackId)
 

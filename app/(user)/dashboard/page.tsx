@@ -65,6 +65,7 @@ export default function Home() {
   const [authStatus, setAuthStatus] = useState(false);
   const [isAccepted, setIsAccepted] = useState(false);
   const [feedbacks, setFeedbacks] = useState<FeedbackType[]>([]);
+  const [updateFlag, setUpdateFlag] = useState<boolean>(false);
   
   const fetchFeedbacks = async () => {
     const res = await axios.get("/api/messages");
@@ -80,8 +81,12 @@ export default function Home() {
         setAuthStatus(!!res.data);
         setIsAccepted(res.data.acceptMessage)}
     };
-    Promise.all([fetchFeedbacks(), fetchUser()]);
+    fetchUser();
   }, []);
+
+  useEffect(()=>{
+    fetchFeedbacks()
+  }, [updateFlag])
 
   useEffect(()=>{
     if (user && user?.username){
@@ -151,7 +156,7 @@ export default function Home() {
         >
           <HiOutlineRefresh />
         </Button>
-        <AllFeedbacks feedbacks={feedbacks} setIsOpen={setIsOpen} />
+        <AllFeedbacks setUpdateFlag={setUpdateFlag} feedbacks={feedbacks} setIsOpen={setIsOpen} />
         <AlertDialog open={isOpen} onOpenChange={setIsOpen}>
           <AlertDialogContent>
             <AlertDialogHeader>

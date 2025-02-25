@@ -37,7 +37,7 @@ export default function UserPage() {
             <Button
               variant="outline"
               key={index}
-              className="py-6 hover:bg-slate-800"
+              className="py-6 z-40 hover:bg-slate-800"
               onClick={() => {
                 setContent(message);
               }}
