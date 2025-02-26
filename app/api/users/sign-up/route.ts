@@ -24,8 +24,12 @@ export async function POST(req: NextRequest) {
   const body = await req.json()
  
   const { username, password, email, otpCode } = body;
+  
+  console.log(decoded.otp)
+  console.log(otpCode)
 
-  if (decoded.otp!==otpCode){
+
+  if (decoded.otp.toString()!==otpCode){
     return NextResponse.json({error:"Invalid OTP"}, {status:403})
   }
 
@@ -42,12 +46,6 @@ export async function POST(req: NextRequest) {
     username
   });
 
-  const otpToken = jwt.sign({otp}, env.OTP_TOKEN_SECRET, {expiresIn:env.OTP_TOKEN_EXPIRY})
-
-  if (!otpToken){
-    return NextResponse.json({ error: "Failed to generate OTP token" }, { status: 500 });
-  }
-
   const userData = await User.findById(user._id).select("-password")
 
   if (!userData) {
@@ -56,7 +54,7 @@ export async function POST(req: NextRequest) {
 
   
   const res = new NextResponse(userData, {status:200})
-  res.cookies.set("otpToken", otpToken)
+  res.cookies.delete("otpToken")
   return res
 
 }

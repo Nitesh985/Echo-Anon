@@ -84,62 +84,72 @@ export default function InputForm() {
       confirmPassword: "",
     },
   });
-  const [page, setPage] = useState(2)
+  const [page, setPage] = useState(1)
   const router = useRouter();
   const [isLoading, setIsLoading] = useState(false);
   const [otpCode, setOtpCode] = useState("");
-  const [counter, setCounter] = useState(120);
+  const [counter, setCounter] = useState(0);
+
+  async function sendEmail(){
+    setCounter(120)
+    setIsLoading(true)
+    try{
+      const username = form.getValues("username")
+      const email = form.getValues("email")
+
+
+      const response = await axios.post("/api/users/send-email", {username, email})
+
+      if (response.status === 200){
+        toast.success("Email sent successfully!", {
+          description:`<div>
+            <h1>Dear ${username}</h1>
+            <p>Please verify your email address by entering the 6-digit code sent to ${email}.</p>
+          </div>`
+        })
+      }
+
+    } catch(error){
+      if (error && error?.response && error?.response?.data && error?.response?.data?.message){
+        toast.error(error.response.data.message)
+      }
+    } finally{
+      setIsLoading(false)
+    }
+  }
 
 
     async function onSubmit(data: z.infer<typeof FormSchema>) {
     try {
       if (page===1){
-        setPage(2)
-        return
+        sendEmail()
+        .then(()=>
+          setPage(2)
+      )
+      return
       }
-      if (page===1){
-      setIsLoading(true);
-      const emailSendRes = await axios.post("/api/users/send-email")
-      if (emailSendRes.status === 200) {
-        toast.success("Email sent successfully!", {
-          description:<div>
-            <h1>Hello {data.username}</h1>
-            <p>Please check your email for a verification code.</p>
-          </div>
-        })
-        setPage(2)
-        return
-      } else {
-        toast.error("Failed to send email. Please try again.")
-        return
-      }}
-
-      const response = await axios.post("/api/users/sign-up", data);
+      setCounter(0)
+      const username = form.getValues("username")
+      const email = form.getValues("email")
+      const password = form.getValues("password")
+      
+      const response = await axios.post("/api/users/sign-up", {username, email, password, otpCode});
 
       if (response.status === 200) {
-        const res = await axios.post("/api/users/sign-in", data);
+        const res = await axios.post("/api/users/sign-in", {username, password});
 
         if (res.status === 200) {
-          data["password"] = "********";
-          data["confirmPassword"] = "********";
-          toast("User is registered successfully!:", {
-            description: (
-              <pre className="mt-2 w-[340px] rounded-md bg-slate-950 p-4">
-                <code className="text-white">
-                  {JSON.stringify(data, null, 2)}
-                </code>
-              </pre>
-            ),
-          });
+          toast.success("User is registered successfully!:")
           router.push("/dashboard");
         }
-      }
-    } catch (error) {
+        }
+      } catch (error) {
       console.error(error);
     } finally {
       setIsLoading(false);
     }
   }
+
 
 
 
@@ -259,7 +269,7 @@ export default function InputForm() {
           </div>
       </div>
   )
-  break;
+
 
   case 2: return(
     <>
@@ -289,9 +299,9 @@ export default function InputForm() {
                   <>You entered: {otpCode}</>
               )}
           </div>
-          <button className="hover:underline text-sm hover:text-purple-400 transition-colors duration-300 ease-in" >Resend Code?
+          <button className="hover:underline text-sm hover:text-purple-400 transition-colors duration-300 ease-in" onClick={sendEmail} >Resend Code?
           </button>
-      <Button variant="outline" className="rounded-xl hover:text-slate-900 hover:bg-slate-100" onClick={() =>{}}>Submit</Button>
+      <Button variant="outline" className="rounded-xl hover:text-slate-900 hover:bg-slate-100" onClick={onSubmit} >Submit</Button>
     </div>
     </>
   )

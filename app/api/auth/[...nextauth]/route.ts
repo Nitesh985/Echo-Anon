@@ -13,7 +13,10 @@ export const authOptions = {
         clientId: env.GITHUB_CLIENT_ID,
         clientSecret: env.GITHUB_CLIENT_SECRET
       })
-    ]    
+    ],
+    callbacks:{
+      async signIn()
+    }    
 }
 
 const handler = NextAuth(authOptions)
