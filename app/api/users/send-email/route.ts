@@ -13,14 +13,6 @@ export async function POST(req: NextRequest) {
  
   const { username, email } = body;
 
-  const userExists = await User.findOne({
-        $or: [{ email }, { username }]
-      });
-      
-      if (userExists){
-        return NextResponse.json({ error: "The user by that name or email already exists" }, { status: 401 });
-      }
-
   for (const field of reqFields) {
       if (!body[field]) {
           return NextResponse.json({ error: `${field.charAt(0).toUpperCase() + field.slice(1)} is a required field` }, { status: 400 });

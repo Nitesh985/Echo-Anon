@@ -6,9 +6,9 @@ export default function Counter({counter, setCounter}: {counter:number, setCount
         function decrementCounter(){
               setCounter(prevState => Math.max(prevState - 1, 0));
         }
-      const timerId = setTimeout(decrementCounter, 1000)
-        return ()=>clearTimeout(timerId)
-    },[counter])
+      const timerId = setInterval(decrementCounter, 1000)
+        return ()=>clearInterval(timerId)
+    },[setCounter])
 
     return(
         <>
