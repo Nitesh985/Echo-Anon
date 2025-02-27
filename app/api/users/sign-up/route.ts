@@ -5,40 +5,33 @@ import { User } from "@/model/user.model";
 import { NextResponse } from "next/server";
 import type { NextRequest } from 'next/server'
 import jwt from 'jsonwebtoken'
+import {connectToDB} from "@/lib/connectToDB";
 
 
 export async function POST(req: NextRequest) {
-  const token = req.cookies.get("otpToken")?.value
-    if (!token){
-    return NextResponse.json({error:"OTP Expired!!!"}, {status:403})
-  }
-      
-    const decoded = jwt.verify(token, env.OTP_TOKEN_SECRET)
+  const reqFields = ["email", "username", "password"];
 
-    if (!decoded){
-        return NextResponse.json({error:"OTP Expired"}, {status:403})
-    }
-
-  const reqFields = ["email", "username", "password", "otpCode"];
-  
   const body = await req.json()
- 
-  const { username, password, email, otpCode } = body;
-  
-  console.log(decoded.otp)
-  console.log(otpCode)
+  console.log(body)
 
+  const { username, password, email} = body;
 
-  if (decoded.otp.toString()!==otpCode){
-    return NextResponse.json({error:"Invalid OTP"}, {status:403})
-  }
+  console.log(username)
+  console.log(body)
 
-  
   for (const field of reqFields) {
       if (!body[field]) {
           return NextResponse.json({ error: `${field.charAt(0).toUpperCase() + field.slice(1)} is a required field` }, { status: 400 });
         }
     }
+
+  const userExists = await User.find({
+    $or:[{username}, {email}]
+  })
+
+  if (userExists){
+    return NextResponse.json({error:"The user by that email or username already exists"}, {status:401})
+  }
 
   const user = await User.create({
     email,
@@ -54,7 +47,6 @@ export async function POST(req: NextRequest) {
 
   
   const res = new NextResponse(userData, {status:200})
-  res.cookies.delete("otpToken")
   return res
 
 }
